@@ -17,7 +17,7 @@ export const CONCERT = {
   time: '19:00',
 }
 
-const SECTIONS = ['A', 'B', 'C', 'D', 'E']
+export const SECTIONS = ['A', 'B']
 const ROWS = 10
 const NUMBERS = 10
 
