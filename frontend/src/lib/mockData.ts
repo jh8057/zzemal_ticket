@@ -18,7 +18,8 @@ export const CONCERT = {
 }
 
 export const SECTIONS = ['A', 'B']
-const ROWS = 10
+export const MAX_USERS = 300   // 회차당 최대 입장 인원
+const ROWS = 5
 const NUMBERS = 10
 
 export function generateMockSeats(): Seat[] {
