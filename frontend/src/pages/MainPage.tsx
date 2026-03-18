@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MAX_USERS } from '../lib/mockData'
 import { CYCLE_MS, calcRound, calcNextBoundaryMs, diffToMmSs, pad, isQueueOpen, isQueueSoon } from '../lib/roundUtils'
+import ConcertHero from '../components/ConcertHero'
 
 const ACCENT = '#ea580c'
 
@@ -26,11 +27,23 @@ export default function MainPage() {
         borderBottom: '1px solid #e5e5e5',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ fontSize: '1rem', letterSpacing: '0.12em', fontWeight: 700 }}>ZZEMAL TICKET</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="10" width="16" height="3" rx="1" fill="#111" />
+            <circle cx="5" cy="7" r="2" fill="#ea580c" />
+            <circle cx="13" cy="7" r="2" fill="#ea580c" />
+            <line x1="5" y1="9" x2="5" y2="10" stroke="#ea580c" strokeWidth="1.5" />
+            <line x1="13" y1="9" x2="13" y2="10" stroke="#ea580c" strokeWidth="1.5" />
+          </svg>
+          <span style={{ fontSize: '1rem', letterSpacing: '0.12em', fontWeight: 700 }}>CONCERT</span>
+        </span>
         <span style={{ fontSize: '0.875rem', color: '#555', fontWeight: 500 }}>티켓팅 연습</span>
       </header>
 
-      <main style={{ maxWidth: '560px', margin: '0 auto', padding: '52px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <main style={{ maxWidth: '560px', margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ borderBottom: '1px solid #e5e5e5', marginBottom: '8px', paddingBottom: '8px' }}>
+          <ConcertHero />
+        </div>
         <div style={{ marginBottom: '8px' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px' }}>연습 모드 선택</h1>
           <p style={{ fontSize: '0.95rem', color: '#444', margin: 0, fontWeight: 500 }}>

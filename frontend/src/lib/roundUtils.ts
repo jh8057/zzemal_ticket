@@ -1,15 +1,15 @@
 /**
- * 사이클 구조 (4분 단위)
- *   0s ~ 59s  : 대기열 오픈 (입장 가능)
- *  60s ~ 179s : 좌석 선택 (2분)
- * 180s ~ 239s : 쿨다운 (1분 버퍼)
+ * 사이클 구조 (3분 단위)
+ *   0s ~  59s : 대기열 오픈 (입장 가능)
+ *  60s ~ 149s : 좌석 선택 (1분 30초)
+ * 150s ~ 179s : 쿨다운 (30초)
  *
- * 100좌석 / 최대 300명 → 좌석 경쟁 후 자연 종료 + 1분 쿨다운
+ * 100좌석 / 최대 300명 → 좌석 경쟁 후 자연 종료 + 30초 쿨다운
  */
 
-export const CYCLE_MS = 4 * 60 * 1000   // 4분 사이클
-export const QUEUE_OPEN_MS = 60 * 1000  // 대기열 오픈 1분
-export const SELECT_MS = 2 * 60 * 1000  // 좌석 선택 2분
+export const CYCLE_MS = 3 * 60 * 1000        // 3분 사이클
+export const QUEUE_OPEN_MS = 60 * 1000        // 대기열 오픈 1분
+export const SELECT_MS = 90 * 1000            // 좌석 선택 1분 30초
 
 /** 오늘 자정 기준 4분 단위로 몇 번째 회차인지 (1-based) */
 export function calcRound(): number {
