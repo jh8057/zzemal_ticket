@@ -1,4 +1,4 @@
-export type SeatStatus = 'available' | 'held' | 'booked'
+export type SeatStatus = 'available' | 'booked'
 
 export interface Seat {
   seatId: string
@@ -27,8 +27,7 @@ export function generateMockSeats(): Seat[] {
     for (let row = 1; row <= ROWS; row++) {
       for (let num = 1; num <= NUMBERS; num++) {
         const rand = Math.random()
-        const status: SeatStatus =
-          rand < 0.6 ? 'available' : rand < 0.85 ? 'booked' : 'held'
+        const status: SeatStatus = rand < 0.6 ? 'available' : 'booked'
         seats.push({
           seatId: `${CONCERT.id}#${section}${row}-${String(num).padStart(2, '0')}`,
           section,

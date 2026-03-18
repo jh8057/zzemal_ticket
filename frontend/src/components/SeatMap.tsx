@@ -9,7 +9,6 @@ interface SeatMapProps {
 
 const SEAT_BG: Record<SeatStatus, string> = {
   available: '#22c55e',
-  held: '#f59e0b',
   booked: '#e5e5e5',
 }
 
@@ -77,8 +76,7 @@ export default function SeatMap({ seats, section, selectedSeatId, onSeatClick }:
       <div style={{ display: 'flex', gap: '16px', paddingTop: '12px', borderTop: '1px solid #e5e5e5' }}>
         {[
           { color: '#22c55e', label: '선택 가능' },
-          { color: '#f59e0b', label: '선점 중' },
-          { color: '#e5e5e5', label: '예매 완료', border: '1px solid #ccc' },
+          { color: '#e5e5e5', label: '선택 완료', border: '1px solid #ccc' },
         ].map(({ color, label, border }) => (
           <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.7rem', color: '#aaa' }}>
             <span style={{
