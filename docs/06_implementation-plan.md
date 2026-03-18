@@ -41,6 +41,20 @@ frontend/src/
 
 ---
 
+## Phase 1.5: 혼자 연습하기 기록 (프론트 로컬)
+
+> F-13 구현. 백엔드 불필요, localStorage 기반.
+
+- [ ] `lib/soloRecord.ts` — 기록 저장/조회/초기화 유틸
+  - 저장 단위: `{ mode: 'queue' | 'seat', elapsedMs: number, recordedAt: number }`
+  - 주(週) 경계 계산: 매주 월요일 00:00 기준으로 현재 주 데이터만 유지 (다른 주 기록은 자동 폐기)
+  - 평균값 계산 함수 포함
+- [ ] `SoloQueuePage` — 결과 화면에 이번 주 기록 목록 + 평균 반응속도 표시
+- [ ] `SoloSeatPage` — 결과 화면에 이번 주 기록 목록 + 평균 선택 시간 표시
+- [ ] 기록 표시 UI: 시도 횟수, 최고 기록, 평균값 (3가지 지표)
+
+---
+
 ## Phase 2: Lambda + DynamoDB (좌석 선점 / 예매)
 - [ ] DynamoDB 테이블 생성 (Seats, Bookings, Rounds)
 - [ ] Lambda: `POST /queue/join` — 회차 입장 처리
