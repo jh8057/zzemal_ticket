@@ -27,15 +27,18 @@ export default function MainPage() {
         borderBottom: '1px solid #e5e5e5',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="10" width="16" height="3" rx="1" fill="#111" />
-            <circle cx="5" cy="7" r="2" fill="#ea580c" />
-            <circle cx="13" cy="7" r="2" fill="#ea580c" />
-            <line x1="5" y1="9" x2="5" y2="10" stroke="#ea580c" strokeWidth="1.5" />
-            <line x1="13" y1="9" x2="13" y2="10" stroke="#ea580c" strokeWidth="1.5" />
+        <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          {/* Ticket stub icon */}
+          <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '6px' }}>
+            <rect x="0.75" y="0.75" width="20.5" height="14.5" rx="2.5" stroke="#e5e5e5" strokeWidth="1.5" fill="white" />
+            <rect x="0.75" y="0.75" width="20.5" height="3" rx="0" fill="#ea580c" />
+            <rect x="0.75" y="0.75" width="2.5" height="3" fill="#ea580c" />
+            <circle cx="15" cy="0.75" r="3" fill="#fafafa" stroke="#e5e5e5" strokeWidth="1.5" />
+            <circle cx="15" cy="15.25" r="3" fill="#fafafa" stroke="#e5e5e5" strokeWidth="1.5" />
+            <line x1="15" y1="4" x2="15" y2="12" stroke="#ddd" strokeWidth="1" strokeDasharray="2 2" />
           </svg>
-          <span style={{ fontSize: '1rem', letterSpacing: '0.12em', fontWeight: 700 }}>CONCERT</span>
+          <span style={{ fontSize: '1rem', fontWeight: 800, color: '#ea580c' }}>가자!</span>
+          <span style={{ fontSize: '1rem', fontWeight: 700, color: '#111' }}>콘서트</span>
         </span>
         <span style={{ fontSize: '0.875rem', color: '#555', fontWeight: 500 }}>티켓팅 연습</span>
       </header>
