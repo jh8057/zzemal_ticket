@@ -67,7 +67,8 @@ zzemal_ticket/
 │   │   │   ├── SoloQueuePage.tsx     # 대기열 반응속도 연습
 │   │   │   └── SoloSeatPage.tsx      # 좌석 선택 속도 연습
 │   │   ├── components/
-│   │   │   └── SeatMap.tsx           # 좌석 배치도 컴포넌트
+│   │   │   ├── SeatMap.tsx           # 좌석 배치도 컴포넌트
+│   │   │   └── ConcertHero.tsx       # 홈 히어로 티켓 일러스트 (SVG)
 │   │   └── lib/
 │   │       ├── roundUtils.ts         # 회차/주기 계산 유틸
 │   │       ├── mockData.ts           # 좌석 목업 데이터
@@ -91,12 +92,12 @@ zzemal_ticket/
 | 대기열 (Phase 1) | 클라이언트 가짜 번호 시뮬레이션 | 백엔드 없이 UX 완성 후 추가 |
 | 대기열 (Phase 3) | Redis ElastiCache | 실시간 순번 처리 |
 | 인증 | localStorage UUID | 로그인 불필요, 심플하게 |
-| 회차 계산 | 로컬 시간 기준 자정~5분 단위 | 한국 사용자 대상, 서버 불필요 |
+| 회차 계산 | 로컬 시간 기준 자정~3분 단위 | 1분 대기열 + 1분30초 좌석선택 + 30초 쿨다운 |
 
 ## 데이터 흐름 — 좌석 선점 (Phase 2)
 
 1. 사용자가 좌석 클릭
-2. `POST /seats/{id}/hold` — DynamoDB 조건부 쓰기 (status = available인 경우만 held로 변경)
+2. `POST /seats/{id}/hold` — DynamoDB 조건부 쓰기 (status = available인 경우만 처리)
 3. 성공 시 "예매 확정" 버튼 표시
 4. "예매 확정" → `POST /bookings` — DynamoDB에 Booking 저장
 5. 실패 시 (ConditionalCheckFailedException) → "이미 선택된 좌석" 안내

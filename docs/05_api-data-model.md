@@ -13,7 +13,7 @@
 | `row` | Number | 1~10 |
 | `number` | Number | 1~10 |
 | `price` | Number | 99000 |
-| `status` | String | `available` \| `held` \| `booked` |
+| `status` | String | `available` \| `booked` |
 | `heldBy` | String | userId (선점한 사람) |
 | `heldAt` | String | ISO timestamp |
 | `ttl` | Number | Unix timestamp (DynamoDB TTL, 선점 자동 해제) |
@@ -96,6 +96,7 @@ API 없이 개발하는 동안 프론트에서 사용할 mock:
 // 공연 정보
 const CONCERT = { id: "1", title: "2026 연습 콘서트", venue: "연습 홀" }
 
-// 좌석: sections A~E, rows 1~10, numbers 1~10
-// 초기 상태는 랜덤으로 available/booked 섞어서 생성
+// 좌석: sections A, B / rows 1~5 / numbers 1~10 (총 100석)
+// 최대 입장 인원: 300명 (MAX_USERS)
+// 초기 상태는 랜덤으로 available(60%) / booked(40%) 생성
 ```
