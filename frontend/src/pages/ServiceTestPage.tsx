@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SeatMap from '../components/SeatMap'
-import { SECTIONS, generateMockSeats, type Seat } from '../lib/mockData'
-import { FIVE_MIN_MS, calcServiceRound, calcNextBoundaryMs, diffToMmSs, pad, isServiceQueueOpen } from '../lib/roundUtils'
+import { SECTIONS, generateMockSeats, MAX_USERS, type Seat } from '../lib/mockData'
+import {
+  CYCLE_MS, QUEUE_OPEN_MS, SELECT_MS,
+  calcRound, calcNextBoundaryMs, diffToMmSs, pad, isQueueOpen,
+} from '../lib/roundUtils'
 
 const ACCENT = '#ea580c'
-const QUEUE_DURATION_S = 60   // 대기열 대기 1분
-const SELECT_DURATION_S = 240 // 좌석 선택 4분
+const QUEUE_DURATION_S = QUEUE_OPEN_MS / 1000   // 60
+const SELECT_DURATION_S = SELECT_MS / 1000       // 120
 
 type Phase = 'standby' | 'queue' | 'selecting' | 'confirming' | 'result'
 
@@ -16,13 +19,13 @@ export default function ServiceTestPage() {
   const [seats] = useState(() => generateMockSeats())
   const [activeSection, setActiveSection] = useState(SECTIONS[0])
   const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null)
-  const [round] = useState(() => calcServiceRound())
-  const [queueNumber] = useState(() => Math.floor(Math.random() * 1200) + 300)
+  const [round] = useState(() => calcRound())
+  const [queueNumber] = useState(() => Math.floor(Math.random() * (MAX_USERS - 30)) + 30)
   const [, tick] = useState(0)
 
-  const phaseEndMs = useRef(0)         // timed phase 종료 시각
-  const selectingStartMs = useRef(0)   // selecting 진입 시각
-  const finishedMs = useRef(0)         // result 진입 시각 (소요 시간 계산용)
+  const phaseEndMs = useRef(0)
+  const selectingStartMs = useRef(0)
+  const finishedMs = useRef(0)
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -35,7 +38,6 @@ export default function ServiceTestPage() {
             phaseEndMs.current = Date.now() + SELECT_DURATION_S * 1000
             setPhase('selecting')
           } else {
-            // 시간 초과
             finishedMs.current = Date.now()
             setPhase('result')
           }
@@ -69,19 +71,16 @@ export default function ServiceTestPage() {
     setPhase('standby')
   }
 
-  // 현재 보여줄 카운트다운
-  const nextSvc = diffToMmSs(calcNextBoundaryMs(FIVE_MIN_MS))
-  const queueOpen = isServiceQueueOpen()
+  const nextBoundary = diffToMmSs(calcNextBoundaryMs(CYCLE_MS))
+  const queueOpen = isQueueOpen()
   const phaseRemaining = (phase === 'queue' || phase === 'selecting' || phase === 'confirming')
     ? diffToMmSs(phaseEndMs.current)
     : null
 
-  // 대기열에서의 현재 가짜 대기번호
   const currentQueueNo = phaseRemaining
     ? Math.max(1, Math.round(queueNumber * ((phaseRemaining.minutes * 60 + phaseRemaining.seconds) / QUEUE_DURATION_S)))
     : 1
 
-  // 결과: selecting 진입~완료 소요 시간
   const elapsedS = finishedMs.current && selectingStartMs.current
     ? ((finishedMs.current - selectingStartMs.current) / 1000).toFixed(1)
     : null
@@ -100,7 +99,7 @@ export default function ServiceTestPage() {
           onMouseLeave={e => (e.currentTarget.style.color = '#555')}
         >← 뒤로</button>
         <span style={{ color: '#ddd' }}>|</span>
-        <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>실제 서비스 테스트</span>
+        <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>티켓팅 연습</span>
         <span style={{ marginLeft: 'auto', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.875rem', color: '#555', fontWeight: 600 }}>
           오늘 {round}회차
         </span>
@@ -122,10 +121,13 @@ export default function ServiceTestPage() {
               fontSize: 'clamp(4rem, 15vw, 7rem)',
               fontWeight: 700, lineHeight: 1, letterSpacing: '-0.04em', color: '#111',
             }}>
-              {pad(nextSvc.minutes)}:{pad(nextSvc.seconds)}
+              {pad(nextBoundary.minutes)}:{pad(nextBoundary.seconds)}
             </div>
             <p style={{ fontSize: '0.95rem', color: '#444', fontWeight: 500, marginTop: '16px' }}>
-              대기열 진입 1분 → 좌석 선택 4분
+              대기열 입장 1분 → 좌석 선택 2분
+            </p>
+            <p style={{ fontSize: '0.85rem', color: '#888', fontWeight: 500, marginTop: '6px' }}>
+              최대 {MAX_USERS.toLocaleString()}명 · 100석
             </p>
           </div>
 
@@ -161,7 +163,10 @@ export default function ServiceTestPage() {
             }}>
               {currentQueueNo.toLocaleString()}
             </div>
-            <p style={{ fontSize: '0.95rem', color: '#444', fontWeight: 500, marginTop: '28px' }}>
+            <p style={{ fontSize: '0.8rem', color: '#888', fontWeight: 500, marginTop: '8px' }}>
+              / {MAX_USERS.toLocaleString()}명
+            </p>
+            <p style={{ fontSize: '0.95rem', color: '#444', fontWeight: 500, marginTop: '20px' }}>
               입장까지{' '}
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: '#111' }}>
                 {pad(phaseRemaining.minutes)}:{pad(phaseRemaining.seconds)}
@@ -285,7 +290,7 @@ export default function ServiceTestPage() {
                 </p>
               </>
             ) : (
-              <p style={{ fontSize: '1rem', color: '#444', fontWeight: 500 }}>4분 내에 좌석을 선택하지 못했습니다.</p>
+              <p style={{ fontSize: '1rem', color: '#444', fontWeight: 500 }}>2분 내에 좌석을 선택하지 못했습니다.</p>
             )}
           </div>
 

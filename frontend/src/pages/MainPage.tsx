@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  FIVE_MIN_MS, ONE_MIN_MS,
-  calcServiceRound, calcNextBoundaryMs, diffToMmSs, pad, isServiceQueueOpen,
-} from '../lib/roundUtils'
+import { MAX_USERS } from '../lib/mockData'
+import { CYCLE_MS, calcRound, calcNextBoundaryMs, diffToMmSs, pad, isQueueOpen, isQueueSoon } from '../lib/roundUtils'
 
 const ACCENT = '#ea580c'
 
@@ -16,16 +14,10 @@ export default function MainPage() {
     return () => clearInterval(t)
   }, [])
 
-  const round = calcServiceRound()
-  const svc = diffToMmSs(calcNextBoundaryMs(FIVE_MIN_MS))
-  const queue = diffToMmSs(calcNextBoundaryMs(ONE_MIN_MS))
-  const svcOpen = isServiceQueueOpen()
-  const svcElapsed = Date.now() % FIVE_MIN_MS
-  const svcSoon = !svcOpen && svcElapsed >= FIVE_MIN_MS - 10 * 1000
-
-  const queueElapsed = Date.now() % ONE_MIN_MS
-  const queueOpen = queueElapsed < 15 * 1000
-  const queueSoon = !queueOpen && queueElapsed >= ONE_MIN_MS - 10 * 1000
+  const round = calcRound()
+  const nextBoundary = diffToMmSs(calcNextBoundaryMs(CYCLE_MS))
+  const queueOpen = isQueueOpen()
+  const queueSoon = isQueueSoon()
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafafa', color: '#111', fontFamily: 'Noto Sans KR, sans-serif' }}>
@@ -46,52 +38,9 @@ export default function MainPage() {
           </p>
         </div>
 
-        {/* 모드 1: 실제 서비스 테스트 */}
+        {/* 메인 모드: 티켓팅 연습 */}
         <div
           onClick={() => navigate('/service-test')}
-          style={{
-            border: `2px solid ${svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#e5e5e5'}`,
-            borderRadius: '8px', padding: '24px', cursor: 'pointer',
-            background: svcOpen ? '#fff8f5' : svcSoon ? '#fefce8' : '#fff',
-            transition: 'border-color 0.2s, background 0.2s',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <div>
-              <p style={{
-                fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em',
-                color: svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#888', margin: '0 0 4px',
-              }}>
-                {svcOpen ? '● 오픈 중' : svcSoon ? '◎ 오픈 대기중' : '5분 단위'}
-              </p>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>실제 서비스 테스트</h2>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 2px', fontWeight: 500 }}>다음 회차</p>
-              <span style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: '1.5rem', fontWeight: 700,
-                color: svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#111',
-              }}>
-                {pad(svc.minutes)}:{pad(svc.seconds)}
-              </span>
-            </div>
-          </div>
-          <p style={{ fontSize: '0.9rem', color: '#444', margin: '0 0 14px', lineHeight: 1.65, fontWeight: 500 }}>
-            5분마다 대기열 오픈. 실제 티켓팅과 동일한 흐름으로 연습합니다.<br />
-            오늘 기준 <strong style={{ color: '#111' }}>{round}회차</strong>가 누적됩니다.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>
-            <span>1분 대기열</span>
-            <span style={{ color: '#ccc' }}>→</span>
-            <span>4분 좌석 선택</span>
-            <span style={{ color: '#ccc' }}>→</span>
-            <span>결과 확인</span>
-          </div>
-        </div>
-
-        {/* 모드 2: 대기열 빠른 연습 */}
-        <div
-          onClick={() => navigate('/queue-test')}
           style={{
             border: `2px solid ${queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#e5e5e5'}`,
             borderRadius: '8px', padding: '24px', cursor: 'pointer',
@@ -105,27 +54,28 @@ export default function MainPage() {
                 fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em',
                 color: queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#888', margin: '0 0 4px',
               }}>
-                {queueOpen ? '● 오픈 중' : queueSoon ? '◎ 오픈 대기중' : '1분 단위'}
+                {queueOpen ? '● 오픈 중' : queueSoon ? '◎ 오픈 대기중' : '4분 단위'}
               </p>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>대기열 빠른 연습</h2>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>티켓팅 연습</h2>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 2px', fontWeight: 500 }}>다음 시작</p>
+              <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 2px', fontWeight: 500 }}>다음 회차</p>
               <span style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: '1.5rem', fontWeight: 700,
                 color: queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#111',
               }}>
-                00:{pad(queue.seconds)}
+                {pad(nextBoundary.minutes)}:{pad(nextBoundary.seconds)}
               </span>
             </div>
           </div>
           <p style={{ fontSize: '0.9rem', color: '#444', margin: '0 0 14px', lineHeight: 1.65, fontWeight: 500 }}>
-            매 1분마다 15초 대기열 → 45초 좌석 선택을 반복 연습합니다.
+            4분마다 대기열 오픈. 100석 · 최대 {MAX_USERS.toLocaleString()}명 입장.<br />
+            오늘 기준 <strong style={{ color: '#111' }}>{round}회차</strong>가 누적됩니다.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>
-            <span>15초 대기열</span>
+            <span>1분 대기열</span>
             <span style={{ color: '#ccc' }}>→</span>
-            <span>45초 좌석 선택</span>
+            <span>2분 좌석 선택</span>
             <span style={{ color: '#ccc' }}>→</span>
             <span>결과 확인</span>
           </div>
