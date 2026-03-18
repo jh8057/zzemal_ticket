@@ -13,31 +13,31 @@
 ```
 frontend/src/
   lib/
-    mockData.ts       — 좌석 목업 데이터 생성
-    roundUtils.ts     — 회차/주기 계산 유틸 (calcServiceRound, calcNextBoundaryMs 등)
+    mockData.ts       — 좌석 목업 데이터 생성 (100석, MAX_USERS=300)
+    roundUtils.ts     — 회차/주기 계산 유틸 (CYCLE_MS=3분, calcRound 등)
   pages/
-    MainPage.tsx      — 모드 선택 허브 (실서비스/빠른연습)
-    ServiceTestPage.tsx — 5분 단위 실서비스 테스트 (standby→queue→selecting→result)
-    QueueTestPage.tsx — 1분 단위 빠른 연습 (standby→selecting→result)
+    MainPage.tsx      — 모드 선택 허브 (티켓팅 연습 + 혼자 연습하기)
+    ServiceTestPage.tsx — 3분 단위 티켓팅 연습 (standby→queue→selecting→result)
+    SoloQueuePage.tsx — 대기열 반응속도 연습
+    SoloSeatPage.tsx  — 좌석 선택 속도 연습
   components/
     SeatMap.tsx       — 좌석 배치도 컴포넌트
-  App.tsx             — 라우팅 (/, /service-test, /queue-test)
+    ConcertHero.tsx   — 콘서트 정보 헤더 컴포넌트
+  App.tsx             — 라우팅 (/, /service-test, /solo-queue, /solo-seat)
 ```
 
 ### 구현된 기능
-- [x] 두 모드 선택 화면 (오픈 여부에 따라 카드 하이라이트)
-- [x] 오늘 회차 번호 계산 (자정 기준 5분 단위)
-- [x] 실서비스 테스트: 5단계 phase 상태 머신
-  - standby: 다음 5분 경계 카운트다운, 오픈 1분 window에 입장 버튼 활성화
-  - queue: 가짜 대기번호 카운트다운 1분 (progress bar)
-  - selecting: 4분 좌석 선택 + 타임아웃 처리
+- [x] 단일 티켓팅 연습 모드 선택 화면 (오픈 여부에 따라 카드 하이라이트)
+- [x] 오늘 회차 번호 계산 (자정 기준 3분 단위, CYCLE_MS)
+- [x] 최대 300명 입장 제한, 100석 (A/B 구역 각 5행×10열)
+- [x] 티켓팅 연습: 5단계 phase 상태 머신
+  - standby: 다음 3분 경계 카운트다운, 오픈 1분 window에 입장 버튼 활성화
+  - queue: 가짜 대기번호(1~300) 카운트다운 1분 (progress bar)
+  - selecting: 1분 30초 좌석 선택 + 타임아웃 처리
   - confirming: 선택 좌석 확인 및 예매 확정
   - result: 소요 시간(s) 표시 + 다음 회차 도전
-- [x] 빠른 연습: 4단계 phase 상태 머신
-  - standby: 다음 1분 경계 카운트다운, 자동 전이
-  - selecting: 45초 좌석 선택 + 타임아웃
-  - confirming: 확정
-  - result: 소요 시간 + 점수 메시지
+- [x] 대기열 반응속도 연습 (SoloQueuePage)
+- [x] 좌석 선택 속도 연습 (SoloSeatPage)
 
 ---
 

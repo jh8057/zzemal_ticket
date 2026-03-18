@@ -5,10 +5,9 @@
 ```mermaid
 graph TD
     A[브라우저] --> B[S3 + CloudFront\nReact 정적 파일]
-    B --> C[API Gateway]
+    B --> C[Lambda Function URL]
     C --> D[Lambda\n좌석 선점 / 예매]
-    D --> E[(DynamoDB\nSeats / Bookings)]
-    D -.->|Phase 3| F[(Redis ElastiCache\n대기열 / 실시간)]
+    D --> E[(DynamoDB\nSeats / Bookings / Queue\nTTL 기반 홀드)]
 ```
 
 ## Phase 1 구조 (완료 — API 없음)
@@ -17,32 +16,26 @@ graph TD
 브라우저 → S3 (React SPA)
 ```
 
-- 4가지 연습 모드 전부 클라이언트 단독 동작
+- 3가지 연습 모드 전부 클라이언트 단독 동작 (티켓팅 연습 + 대기열 연습 + 좌석 연습)
 - 좌석 상태는 프론트에서 랜덤 생성 (mock data)
 - 대기열은 가짜 번호 카운트다운으로 시뮬레이션
 
 ## Phase 2 구조 (Lambda + DynamoDB 추가)
 
-- 실서비스/빠른연습 모드의 대기열을 실제 Redis Queue로 대체
+- 티켓팅 연습 모드의 대기열/좌석을 실제 API로 대체
 - 좌석 선점 API (DynamoDB 조건부 쓰기로 동시성 처리)
 - 예매 확정 API
+- API Gateway 없이 Lambda Function URL 직접 호출 (비용 최적화)
 
 ## 핵심 페이지 흐름
 
 ```
 메인 (/)
- ├── [실서비스 테스트] → /service-test
- │     standby (5분 카운트다운)
+ ├── [티켓팅 연습] → /service-test
+ │     standby (3분 카운트다운)
  │     → 대기열 입장 버튼 클릭
- │     → queue (1분 가짜 대기번호)
- │     → selecting (4분 좌석 선택)
- │     → confirming → result
- │
- ├── [대기열 빠른 연습] → /queue-test
- │     standby (1분 카운트다운)
- │     → 대기열 입장 버튼 클릭
- │     → queue (15초 가짜 대기번호)
- │     → selecting (45초 좌석 선택)
+ │     → queue (1분 가짜 대기번호, 최대 300명)
+ │     → selecting (1분 30초 좌석 선택, 100석)
  │     → confirming → result
  │
  ├── [대기열 반응속도 연습] → /solo-queue
@@ -62,16 +55,15 @@ zzemal_ticket/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── MainPage.tsx          # 모드 선택 허브
-│   │   │   ├── ServiceTestPage.tsx   # 5분 단위 실서비스 테스트
-│   │   │   ├── QueueTestPage.tsx     # 1분 단위 빠른 연습
+│   │   │   ├── ServiceTestPage.tsx   # 3분 단위 티켓팅 연습 (통합)
 │   │   │   ├── SoloQueuePage.tsx     # 대기열 반응속도 연습
 │   │   │   └── SoloSeatPage.tsx      # 좌석 선택 속도 연습
 │   │   ├── components/
 │   │   │   ├── SeatMap.tsx           # 좌석 배치도 컴포넌트
 │   │   │   └── ConcertHero.tsx       # 홈 히어로 티켓 일러스트 (SVG)
 │   │   └── lib/
-│   │       ├── roundUtils.ts         # 회차/주기 계산 유틸
-│   │       ├── mockData.ts           # 좌석 목업 데이터
+│   │       ├── roundUtils.ts         # 회차/주기 계산 유틸 (CYCLE_MS=3분)
+│   │       ├── mockData.ts           # 좌석 목업 데이터 (100석, MAX_USERS=300)
 │   │       └── api.ts                # Lambda API 호출 (Phase 2)
 │   └── ...
 ├── backend/                   # Lambda 함수 (Phase 2)
@@ -88,11 +80,13 @@ zzemal_ticket/
 | 결정 | 선택 | 이유 |
 |------|------|------|
 | 동시성 처리 | DynamoDB 조건부 쓰기 (ConditionExpression) | Redis 없이 서버리스에서 SET NX EX 동일 효과 |
-| 배포 | S3 정적 + Lambda | 인프라 관리 최소화 |
+| 배포 | S3 정적 + Lambda Function URL | 인프라 관리 최소화, API Gateway 비용 제거 |
 | 대기열 (Phase 1) | 클라이언트 가짜 번호 시뮬레이션 | 백엔드 없이 UX 완성 후 추가 |
-| 대기열 (Phase 3) | Redis ElastiCache | 실시간 순번 처리 |
+| 대기열 (Phase 2+) | DynamoDB TTL 기반 큐 | Redis ElastiCache 고정비 제거 |
+| 실시간 좌석 현황 | 3초 폴링 | WebSocket 대비 구현 단순, 비용 절감 |
 | 인증 | localStorage UUID | 로그인 불필요, 심플하게 |
 | 회차 계산 | 로컬 시간 기준 자정~3분 단위 | 1분 대기열 + 1분30초 좌석선택 + 30초 쿨다운 |
+| 입장 제한 | MAX_USERS=300, 100석 (5행×10열×2구역) | API 호출 부하 최소화 |
 
 ## 데이터 흐름 — 좌석 선점 (Phase 2)
 
