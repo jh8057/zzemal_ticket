@@ -124,7 +124,7 @@ export default function ServiceTestPage() {
               {pad(nextBoundary.minutes)}:{pad(nextBoundary.seconds)}
             </div>
             <p style={{ fontSize: '0.95rem', color: '#444', fontWeight: 500, marginTop: '16px' }}>
-              대기열 입장 1분 → 좌석 선택 2분
+              대기열 입장 1분 → 좌석 선택 1분 30초
             </p>
             <p style={{ fontSize: '0.85rem', color: '#888', fontWeight: 500, marginTop: '6px' }}>
               최대 {MAX_USERS.toLocaleString()}명 · 100석
@@ -290,7 +290,7 @@ export default function ServiceTestPage() {
                 </p>
               </>
             ) : (
-              <p style={{ fontSize: '1rem', color: '#444', fontWeight: 500 }}>2분 내에 좌석을 선택하지 못했습니다.</p>
+              <p style={{ fontSize: '1rem', color: '#444', fontWeight: 500 }}>1분 30초 내에 좌석을 선택하지 못했습니다.</p>
             )}
           </div>
 

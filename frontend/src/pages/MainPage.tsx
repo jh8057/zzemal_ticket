@@ -67,7 +67,7 @@ export default function MainPage() {
                 fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em',
                 color: queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#888', margin: '0 0 4px',
               }}>
-                {queueOpen ? '● 오픈 중' : queueSoon ? '◎ 오픈 대기중' : '4분 단위'}
+                {queueOpen ? '● 오픈 중' : queueSoon ? '◎ 오픈 대기중' : '3분 단위'}
               </p>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>티켓팅 연습</h2>
             </div>
@@ -82,13 +82,13 @@ export default function MainPage() {
             </div>
           </div>
           <p style={{ fontSize: '0.9rem', color: '#444', margin: '0 0 14px', lineHeight: 1.65, fontWeight: 500 }}>
-            4분마다 대기열 오픈. 100석 · 최대 {MAX_USERS.toLocaleString()}명 입장.<br />
+            3분마다 대기열 오픈. 100석 · 최대 {MAX_USERS.toLocaleString()}명 입장.<br />
             오늘 기준 <strong style={{ color: '#111' }}>{round}회차</strong>가 누적됩니다.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>
             <span>1분 대기열</span>
             <span style={{ color: '#ccc' }}>→</span>
-            <span>2분 좌석 선택</span>
+            <span>1분 30초 좌석 선택</span>
             <span style={{ color: '#ccc' }}>→</span>
             <span>결과 확인</span>
           </div>
