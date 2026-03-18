@@ -20,7 +20,12 @@ export default function MainPage() {
   const svc = diffToMmSs(calcNextBoundaryMs(FIVE_MIN_MS))
   const queue = diffToMmSs(calcNextBoundaryMs(ONE_MIN_MS))
   const svcOpen = isServiceQueueOpen()
-  const queueOpen = Date.now() % ONE_MIN_MS < 15 * 1000
+  const svcElapsed = Date.now() % FIVE_MIN_MS
+  const svcSoon = !svcOpen && svcElapsed >= FIVE_MIN_MS - 10 * 1000
+
+  const queueElapsed = Date.now() % ONE_MIN_MS
+  const queueOpen = queueElapsed < 15 * 1000
+  const queueSoon = !queueOpen && queueElapsed >= ONE_MIN_MS - 10 * 1000
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafafa', color: '#111', fontFamily: 'Noto Sans KR, sans-serif' }}>
@@ -45,9 +50,9 @@ export default function MainPage() {
         <div
           onClick={() => navigate('/service-test')}
           style={{
-            border: `2px solid ${svcOpen ? ACCENT : '#e5e5e5'}`,
+            border: `2px solid ${svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#e5e5e5'}`,
             borderRadius: '8px', padding: '24px', cursor: 'pointer',
-            background: svcOpen ? '#fff8f5' : '#fff',
+            background: svcOpen ? '#fff8f5' : svcSoon ? '#fefce8' : '#fff',
             transition: 'border-color 0.2s, background 0.2s',
           }}
         >
@@ -55,9 +60,9 @@ export default function MainPage() {
             <div>
               <p style={{
                 fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em',
-                color: svcOpen ? ACCENT : '#888', margin: '0 0 4px',
+                color: svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#888', margin: '0 0 4px',
               }}>
-                {svcOpen ? '● 오픈 중' : '5분 단위'}
+                {svcOpen ? '● 오픈 중' : svcSoon ? '◎ 오픈 대기중' : '5분 단위'}
               </p>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>실제 서비스 테스트</h2>
             </div>
@@ -65,7 +70,7 @@ export default function MainPage() {
               <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 2px', fontWeight: 500 }}>다음 회차</p>
               <span style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: '1.5rem', fontWeight: 700,
-                color: svcOpen ? ACCENT : '#111',
+                color: svcOpen ? ACCENT : svcSoon ? '#ca8a04' : '#111',
               }}>
                 {pad(svc.minutes)}:{pad(svc.seconds)}
               </span>
@@ -88,9 +93,9 @@ export default function MainPage() {
         <div
           onClick={() => navigate('/queue-test')}
           style={{
-            border: `2px solid ${queueOpen ? ACCENT : '#e5e5e5'}`,
+            border: `2px solid ${queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#e5e5e5'}`,
             borderRadius: '8px', padding: '24px', cursor: 'pointer',
-            background: queueOpen ? '#fff8f5' : '#fff',
+            background: queueOpen ? '#fff8f5' : queueSoon ? '#fefce8' : '#fff',
             transition: 'border-color 0.2s, background 0.2s',
           }}
         >
@@ -98,9 +103,9 @@ export default function MainPage() {
             <div>
               <p style={{
                 fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em',
-                color: queueOpen ? ACCENT : '#888', margin: '0 0 4px',
+                color: queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#888', margin: '0 0 4px',
               }}>
-                {queueOpen ? '● 오픈 중' : '1분 단위'}
+                {queueOpen ? '● 오픈 중' : queueSoon ? '◎ 오픈 대기중' : '1분 단위'}
               </p>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>대기열 빠른 연습</h2>
             </div>
@@ -108,7 +113,7 @@ export default function MainPage() {
               <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 2px', fontWeight: 500 }}>다음 시작</p>
               <span style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: '1.5rem', fontWeight: 700,
-                color: queueOpen ? ACCENT : '#111',
+                color: queueOpen ? ACCENT : queueSoon ? '#ca8a04' : '#111',
               }}>
                 00:{pad(queue.seconds)}
               </span>
