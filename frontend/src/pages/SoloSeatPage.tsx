@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { saveRecord, loadRecords, calcStats } from '../lib/soloRecord'
 import SeatMap from '../components/SeatMap'
 import { SECTIONS, generateMockSeats, type Seat } from '../lib/mockData'
 
@@ -26,6 +27,7 @@ export default function SoloSeatPage() {
   const startMs = useRef(0)
   const seatClickMs = useRef(0)
   const finishedMs = useRef(0)
+  const [weekStats, setWeekStats] = useState(() => calcStats(loadRecords('seat')))
 
   // elapsed 실시간 표시용
   const elapsed = phase === 'selecting' || phase === 'confirming'
@@ -63,6 +65,8 @@ export default function SoloSeatPage() {
       seat: selectedSeat ? `${selectedSeat.section}구역 ${selectedSeat.row}행 ${selectedSeat.number}번` : '',
     }
     setHistory(prev => [record, ...prev].slice(0, 10))
+    saveRecord('seat', record.totalMs)
+    setWeekStats(calcStats(loadRecords('seat')))
     setPhase('result')
   }
 
@@ -239,6 +243,22 @@ export default function SoloSeatPage() {
                 )}
               </div>
             </div>
+
+            {weekStats && (
+              <div style={{ borderTop: '1px solid #e5e5e5', paddingTop: '24px', width: '100%', maxWidth: '320px' }}>
+                <p style={{ fontSize: '0.75rem', color: '#888', letterSpacing: '0.1em', fontWeight: 600, margin: '0 0 14px', textAlign: 'center' }}>이번 주 ({weekStats.count}회)</p>
+                <div style={{ display: 'flex', gap: '32px', justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 4px', color: '#888', fontSize: '0.75rem', letterSpacing: '0.1em' }}>BEST</p>
+                    <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', fontWeight: 700, color: ACCENT, margin: 0 }}>{fmtMs(weekStats.best)}</p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 4px', color: '#888', fontSize: '0.75rem', letterSpacing: '0.1em' }}>AVG</p>
+                    <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', fontWeight: 700, color: '#111', margin: 0 }}>{fmtMs(weekStats.avg)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '280px' }}>
               <button onClick={reset} style={{ width: '100%', padding: '15px', background: ACCENT, color: '#fff', border: 'none', borderRadius: '6px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s' }}

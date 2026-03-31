@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { saveRecord, loadRecords, calcStats } from '../lib/soloRecord'
 
 const ACCENT = '#ea580c'
 const INTERVAL_S = 10
@@ -15,6 +16,7 @@ export default function SoloQueuePage() {
 
   const openedAtMs = useRef(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [weekStats, setWeekStats] = useState(() => calcStats(loadRecords('queue')))
 
   useEffect(() => {
     startCountdown()
@@ -45,6 +47,8 @@ export default function SoloQueuePage() {
     const ms = Date.now() - openedAtMs.current
     setReactionMs(ms)
     setHistory(prev => [ms, ...prev].slice(0, 10))
+    saveRecord('queue', ms)
+    setWeekStats(calcStats(loadRecords('queue')))
     setPhase('result')
   }
 
@@ -154,6 +158,26 @@ export default function SoloQueuePage() {
                     <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', fontWeight: 700, color: '#111', margin: 0 }}>
                       {avgMs! < 1000 ? `${avgMs}ms` : `${(avgMs! / 1000).toFixed(2)}s`}
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {weekStats && (
+                <div style={{ borderTop: '1px solid #e5e5e5', paddingTop: '24px', width: '100%', maxWidth: '320px' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#888', letterSpacing: '0.1em', fontWeight: 600, margin: '0 0 14px', textAlign: 'center' }}>이번 주 ({weekStats.count}회)</p>
+                  <div style={{ display: 'flex', gap: '32px', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ margin: '0 0 4px', color: '#888', fontSize: '0.75rem', letterSpacing: '0.1em' }}>BEST</p>
+                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', fontWeight: 700, color: ACCENT, margin: 0 }}>
+                        {weekStats.best < 1000 ? `${weekStats.best}ms` : `${(weekStats.best / 1000).toFixed(2)}s`}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ margin: '0 0 4px', color: '#888', fontSize: '0.75rem', letterSpacing: '0.1em' }}>AVG</p>
+                      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', fontWeight: 700, color: '#111', margin: 0 }}>
+                        {weekStats.avg < 1000 ? `${weekStats.avg}ms` : `${(weekStats.avg / 1000).toFixed(2)}s`}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
